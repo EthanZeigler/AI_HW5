@@ -33,7 +33,19 @@ class Agent(threading.Thread):
     #############################################################
     def ai_function(self):
         # To send a key stroke to the game, use self.game.on_key_press() method
-        pass
+        # Stage Information: Each stage is (rows x cols) = (12 x 20) cells
+        # .	empty
+        # 2	platform / left half-circle
+        # 3	platform / right half-circle
+        # 4	platform / rectangle
+        # 5	platform / island
+        # 6	ladder
+        # 7	needle
+        # #	target (100 points)
+        # a	bonus (500 points)
+        # b	bonus (1000 points)
+        # c	enemy1 (always appear on the right)
+        print(self.move_grid)
 
     def run(self):
         print("Starting " + self.name)
