@@ -6,6 +6,12 @@ GAMMA = 0.98
 BONUS_REWARD = 1
 ENEMY_REWARD = -.5
 
+class TType(Enum):
+    MOVE     = auto()
+    JUMP     = auto()
+    INVALID  = auto()
+    DANGER   = auto()
+
 class PlayerState(Enum):
     FACE_RIGHT      = auto()
     FACE_LEFT       = auto()
@@ -13,32 +19,18 @@ class PlayerState(Enum):
 
 
 class CellType(Enum):
-    SPAWN_CELL              = auto()
-    AIR                     = auto()
-    PLATFORM_LEFT_DROPOFF   = auto()
-    PLATFORM_RIGHT_DROPOFF  = auto()
-    PLATFORM_FULL           = auto()
-    PLATFORM_ISLAND         = auto()
-    LADDER                  = auto()
-    NEEDLE                  = auto()
-    BONUS                   = auto()
-
-
-class TType(Enum):
-    MOVE     = 0
-    JUMP     = 1
-    INVALID  = 2
-    DANGER   = 3
-
-# img_world = ['01.png',  # background
-#              '02.png', '03.png', '04.png', '05.png',  # left / right / rectangle / island platform
-#              '06.png',  # ladder
-#              '07.png',  # needle
-#              '08.png']  # bonus
-
-cell_type_map = {  '0'
-
-}
+    SPAWN_CELL              = 0
+    AIR                     = 1
+    PLATFORM_LEFT_DROPOFF   = 2
+    PLATFORM_RIGHT_DROPOFF  = 3
+    PLATFORM_FULL           = 4
+    PLATFORM_ISLAND         = 5
+    LADDER                  = 6
+    NEEDLE                  = 7
+    FRUIT                   = 8
+    BONUS_LOW               = 9
+    BONUS_HIGH              = 10
+    BONUS_DANGER            = 11
 
 naive_transitions = { '0' : TType.INVALID, # Spawn point (right wall)
                  '1' : TType.MOVE,         # Air
