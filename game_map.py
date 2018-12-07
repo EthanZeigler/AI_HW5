@@ -28,6 +28,10 @@ class TType(Enum):
     INVALID  = auto()
     DANGER   = auto()
 
+    def __str__(self):
+        return self.name
+
+
 class PlayerState(Enum):
     FACE_RIGHT      = auto()
     FACE_LEFT       = auto()
@@ -49,6 +53,9 @@ class CellType(Enum):
     BONUS_HIGH              = 10
     BONUS_DANGER            = 11
 
+    def __str__(self):
+        return self.name
+
     def is_safe(self):
         return self == self.PLATFORM_FULL or\
                 self == self.PLATFORM_ISLAND or\
@@ -67,18 +74,18 @@ class CellType(Enum):
                 self == self.PLATFORM_RIGHT_DROPOFF or\
                 self == self.LADDER
 
-naive_transitions = { '0' : TType.INVALID, # Spawn point (right wall)
-                 '1' : TType.MOVE,         # Air
-                 '2' : TType.INVALID,      # Platform / left half-circle
-                 '3' : TType.INVALID,      # Platform / right half-circle
-                 '4' : TType.INVALID,      # Platform / rectangle
-                 '5' : TType.INVALID,      # Platform / island
-                 '6' : TType.MOVE,         # Ladder
-                 '7' : TType.JUMP,         # Needle
-                 '8' : TType.MOVE,         # Fruit
-                 '9' : TType.MOVE,         # Bonus
-                 '10': TType.MOVE,         # Bonus
-                 '11': TType.MOVE          # Bonus (Danger)
+naive_transitions = { 0 : TType.INVALID, # Spawn point (right wall)
+                 1 : TType.MOVE,         # Air
+                 2 : TType.INVALID,      # Platform / left half-circle
+                 3 : TType.INVALID,      # Platform / right half-circle
+                 4 : TType.INVALID,      # Platform / rectangle
+                 5 : TType.INVALID,      # Platform / island
+                 6 : TType.MOVE,         # Ladder
+                 7 : TType.JUMP,         # Needle
+                 8 : TType.MOVE,         # Fruit
+                 9 : TType.MOVE,         # Bonus
+                 10: TType.MOVE,         # Bonus
+                 11: TType.MOVE          # Bonus (Danger)
 }
 
 class GameCell(object):
@@ -90,13 +97,9 @@ class GameCell(object):
         else:
             return CellType.DNE
 
-    def get_transition_type(self, r: int, c: int, g: [[]], t:Direction) -> TType:
-        print(type(t))
-        print(type(t.value))
+    def get_transition_type(self, r:int, c:int, g:[], t:Direction) -> TType:
         # Check if valid cell, otherwise invalid
-        print(t.value[0])
-        print(t.value[1])
-        if is_valid_cell(r, c, g):
+        if is_valid_cell(r + t.value[0], c + t.value[1], g):
             # Get naive transition
             naive_transition = naive_transitions[g[r + t.value[0]][c + t.value[1]]]
             # if invalid, no further checking
@@ -152,6 +155,10 @@ class GameCell(object):
         else:
             g[r][c] = 0
         pass
+
+    def __str__(self) -> str:
+        return self.t_down.__str__().center(15, " ")
+
 
 class GameMap:
     def __init__(self, agent:Agent):

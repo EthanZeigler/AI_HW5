@@ -5,6 +5,8 @@ import time
 import os
 import pygame
 import game_map as ai
+from matplotlib import pyplot as plt
+import sys
 
 
 class Agent(threading.Thread):
@@ -47,8 +49,19 @@ class Agent(threading.Thread):
         # b	bonus (1000 points)
         # c	enemy1 (always appear on the right)
         game_map = ai.GameMap(self)
-        print(game_map.state_grid)
-        exit(1)
+        for line in game_map.state_grid:
+            print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.xaxis.set_visible(False)
+        ax.yaxis.set_visible(False)
+        the_table = ax.table(cellText=game_map.state_grid,
+                             loc='center')
+        plt.show()
+
+        sys.exit()
+
 
     def run(self):
         print("Starting " + self.name)
