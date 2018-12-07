@@ -2,8 +2,8 @@ import arcade
 import game_core
 import threading
 import time
-import os
-import pygame
+#import os
+#import pygame
 import game_map as ai
 from matplotlib import pyplot as plt
 import sys
@@ -11,7 +11,7 @@ import sys
 
 class Agent(threading.Thread):
 
-    def __init__(self, threadID, name, counter, show_grid_info=True):
+    def __init__(self, threadID, name, counter, show_grid_info=False):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
@@ -57,8 +57,11 @@ class Agent(threading.Thread):
         ax.xaxis.set_visible(True)
         ax.yaxis.set_visible(True)
         the_table = ax.table(cellText=game_map.state_grid,
+                             cellColours=[[game_map.state_colors[(game_map.state_grid[r][c]).cell_type]
+                                           for c in range(len(game_map.state_grid[r]))]
+                                           for r in range(len(game_map.state_grid))],
                              loc='center')
-        plt.savefig("/media/sf_Ethan/Desktop/t_left.png")
+        plt.savefig("fig1.png")
 
         sys.exit(-1)
 
@@ -66,29 +69,22 @@ class Agent(threading.Thread):
     def run(self):
         print("Starting " + self.name)
 
-        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (50+320, 50)
-        pygame.init()
+        # os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (50+320, 50)
+        # pygame.init()
 
         # Prepare grid information display (can be turned off if performance issue exists)
-        if self.show_grid_info:
-            screen_size = [200, 120]
-            backscreen_size = [40, 12]
-
-            screen = pygame.display.set_mode(screen_size)
-            backscreen = pygame.Surface(backscreen_size)
-            arr = pygame.PixelArray(backscreen)
-        else:
-            time.sleep(0.5)  # wait briefly so that main game can get ready
+        time.sleep(2)  # wait briefly so that main game can get ready
 
         # roughly every 50 milliseconds, retrieve game state (average human response time for visual stimuli = 25 ms)
         go = True
         while go and (self.game is not []):
             # Dispatch events from pygame window event queue
             if self.show_grid_info:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        go = False
-                        break
+                pass
+                # for event in pygame.event.get():
+                #     if event.type == pygame.QUIT:
+                #         go = False
+                #         break
 
             # RETRIEVE CURRENT GAME STATE
             self.move_grid, self.kill_grid, \
@@ -99,19 +95,19 @@ class Agent(threading.Thread):
             self.ai_function()
 
             # Display grid information (can be turned off if performance issue exists)
-            if self.show_grid_info:
-                for row in range(12):
-                    for col in range(20):
-                        c = self.move_grid[row][col] * 255 / 12
-                        arr[col, row] = (c, c, c)
-                    for col in range(20, 40):
-                        if self.kill_grid[row][col-20]:
-                            arr[col, row] = (255, 0, 0)
-                        else:
-                            arr[col, row] = (255, 255, 255)
-
-                pygame.transform.scale(backscreen, screen_size, screen)
-                pygame.display.flip()
+            # if self.show_grid_info:
+            #     for row in range(12):
+            #         for col in range(20):
+            #             c = self.move_grid[row][col] * 255 / 12
+            #             arr[col, row] = (c, c, c)
+            #         for col in range(20, 40):
+            #             if self.kill_grid[row][col-20]:
+            #                 arr[col, row] = (255, 0, 0)
+            #             else:
+            #                 arr[col, row] = (255, 255, 255)
+            #
+            #     # pygame.transform.scale(backscreen, screen_size, screen)
+            #     # pygame.display.flip()
 
             # We must allow enough CPU time for the main game application
             # Polling interval can be reduced if you don't display the grid information
@@ -122,9 +118,9 @@ class Agent(threading.Thread):
 
 def main():
     ag = Agent(1, "My Agent", 1, True)
+    ag.game = game_core.GameMain()
     ag.start()
 
-    ag.game = game_core.GameMain()
     ag.game.set_location(50, 50)
 
     # Uncomment below for recording

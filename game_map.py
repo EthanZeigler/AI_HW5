@@ -90,6 +90,7 @@ naive_transitions = { 0 : TType.INVALID, # Spawn point (right wall)
 
 class GameCell(object):
 
+
     @staticmethod
     def get_cell_type(r:int, c:int, g:[[]]) -> CellType:
         if is_valid_cell(r, c, g):
@@ -105,8 +106,10 @@ class GameCell(object):
             # if invalid, no further checking
             if naive_transition == TType.INVALID: return naive_transition
             # refine for platform check
-            ground_cell = GameCell.get_cell_type(r + t.value[0] - 1, c + t.value[1], g) if naive_transition is TType.MOVE else\
-                GameCell.get_cell_type(r - 1, c + (2 * t.value[1]), g)
+            ground_cell = GameCell.get_cell_type(r + t.value[0] + Direction.DOWN.value[0],
+                                                 c + t.value[1] + Direction.DOWN.value[1], g)\
+                                        if naive_transition is TType.MOVE else\
+                                            GameCell.get_cell_type(r - 1, c + (2 * t.value[1]), g)
             # check if valid platform
             return naive_transition if CellType.is_safe_ground(ground_cell) else TType.DANGER
         else:
@@ -161,6 +164,20 @@ class GameCell(object):
 
 
 class GameMap:
+    state_colors = {CellType.BONUS_DANGER: 'xkcd:pale yellow',
+                    CellType.BONUS_HIGH: 'xkcd:kelly green',
+                    CellType.BONUS_LOW: 'xkcd:kelly green',
+                    CellType.FRUIT: 'xkcd:pastel green',
+                    CellType.LADDER: 'xkcd:turquoise',
+                    CellType.PLATFORM_RIGHT_DROPOFF: 'xkcd:baby pink',
+                    CellType.PLATFORM_LEFT_DROPOFF: 'xkcd:baby pink',
+                    CellType.PLATFORM_ISLAND: 'xkcd:baby pink',
+                    CellType.PLATFORM_FULL: 'xkcd:baby pink',
+                    CellType.DNE: "w",
+                    CellType.AIR: "w",
+                    CellType.NEEDLE: "xkcd:orangish",
+                    CellType.SPAWN_CELL: "xkcd:dark sand"}
+
     def __init__(self, agent:Agent):
         self.raw_grid = copy.deepcopy(agent.move_grid)
         self.state_grid = []
