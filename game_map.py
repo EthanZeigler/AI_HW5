@@ -109,9 +109,18 @@ class GameCell(object):
             ground_cell = GameCell.get_cell_type(r + t.value[0] + Direction.DOWN.value[0],
                                                  c + t.value[1] + Direction.DOWN.value[1], g)\
                                         if naive_transition is TType.MOVE else\
-                                            GameCell.get_cell_type(r - 1, c + (2 * t.value[1]), g)
+                                            GameCell.get_cell_type(r + Direction.DOWN.value[0], c + (2 * t.value[1]), g)
             # check if valid platform
-            return naive_transition if CellType.is_safe_ground(ground_cell) else TType.DANGER
+            # yeah, it's awful
+            # if up or down, dont return danger, but invalid
+            if CellType.is_safe_ground(ground_cell):
+                return naive_transition
+            elif t == Direction.UP or t == Direction.DOWN:
+                return TType.INVALID
+            elif CellType.is_safe_ground(GameCell.get_cell_type(r + Direction.DOWN.value[0], c + (2 * t.value[1]), g)):
+                return TType.JUMP
+            else:
+                return TType.DANGER
         else:
             return TType.INVALID
 
@@ -160,7 +169,7 @@ class GameCell(object):
         pass
 
     def __str__(self) -> str:
-        return self.t_left.__str__().center(15, " ")
+        return self.t_down.__str__().center(15, " ")
 
 
 class GameMap:

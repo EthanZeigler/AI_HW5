@@ -61,7 +61,7 @@ class Agent(threading.Thread):
                                            for c in range(len(game_map.state_grid[r]))]
                                            for r in range(len(game_map.state_grid))],
                              loc='center')
-        plt.savefig("fig1.png")
+        plt.savefig("t_down_inspect.png")
 
         sys.exit(-1)
 
