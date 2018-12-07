@@ -52,15 +52,15 @@ class Agent(threading.Thread):
         for line in game_map.state_grid:
             print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
 
-        fig = plt.figure()
+        fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
         ax = fig.add_subplot(111)
-        ax.xaxis.set_visible(False)
-        ax.yaxis.set_visible(False)
+        ax.xaxis.set_visible(True)
+        ax.yaxis.set_visible(True)
         the_table = ax.table(cellText=game_map.state_grid,
                              loc='center')
-        plt.show()
+        plt.savefig("/media/sf_Ethan/Desktop/Figure 1.png")
 
-        sys.exit()
+        sys.exit(-1)
 
 
     def run(self):
