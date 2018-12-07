@@ -4,6 +4,7 @@ import threading
 import time
 import os
 import pygame
+import game_map as ai
 
 
 class Agent(threading.Thread):
@@ -45,7 +46,9 @@ class Agent(threading.Thread):
         # a	bonus (500 points)
         # b	bonus (1000 points)
         # c	enemy1 (always appear on the right)
-        print(self.move_grid)
+        game_map = ai.GameMap(self)
+        print(game_map.state_grid)
+        exit(1)
 
     def run(self):
         print("Starting " + self.name)

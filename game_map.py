@@ -2,9 +2,25 @@ from enum import Enum, auto
 import copy
 from main import Agent
 
+# MDP Values and costs
 GAMMA = 0.98
 BONUS_REWARD = 1
 ENEMY_REWARD = -.5
+
+# Data structures and magic number wrappers
+
+class Direction(Enum):
+    UP     = (1, 0)
+    DOWN   = (-1, 0)
+    LEFT   = (0, -1)
+    RIGHT  = (0, 1)
+
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+
+
+
 
 class TType(Enum):
     MOVE     = auto()
@@ -19,6 +35,7 @@ class PlayerState(Enum):
 
 
 class CellType(Enum):
+    DNE                     = -1
     SPAWN_CELL              = 0
     AIR                     = 1
     PLATFORM_LEFT_DROPOFF   = 2
@@ -31,6 +48,24 @@ class CellType(Enum):
     BONUS_LOW               = 9
     BONUS_HIGH              = 10
     BONUS_DANGER            = 11
+
+    def is_safe(self):
+        return self == self.PLATFORM_FULL or\
+                self == self.PLATFORM_ISLAND or\
+                self == self.PLATFORM_LEFT_DROPOFF or\
+                self == self.PLATFORM_RIGHT_DROPOFF or\
+                self == self.LADDER or\
+                self == self.FRUIT or\
+                self == self.BONUS_LOW or\
+                self == self.BONUS_HIGH or\
+                self == self.BONUS_DANGER
+
+    def is_safe_ground(self):
+        return self == self.PLATFORM_FULL or\
+                self == self.PLATFORM_ISLAND or\
+                self == self.PLATFORM_LEFT_DROPOFF or\
+                self == self.PLATFORM_RIGHT_DROPOFF or\
+                self == self.LADDER
 
 naive_transitions = { '0' : TType.INVALID, # Spawn point (right wall)
                  '1' : TType.MOVE,         # Air
@@ -46,33 +81,49 @@ naive_transitions = { '0' : TType.INVALID, # Spawn point (right wall)
                  '11': TType.MOVE          # Bonus (Danger)
 }
 
+class GameCell(object):
 
+    @staticmethod
+    def get_cell_type(r:int, c:int, g:[[]]) -> CellType:
+        if is_valid_cell(r, c, g):
+            return CellType(g[r][c])
+        else:
+            return CellType.DNE
 
-class GameMap:
-    def __init__(self, agent:Agent):
-        self.grid = copy.deepcopy(agent.move_grid)
+    def get_transition_type(self, r: int, c: int, g: [[]], t:Direction) -> TType:
+        print(type(t))
+        print(type(t.value))
+        # Check if valid cell, otherwise invalid
+        print(t.value[0])
+        print(t.value[1])
+        if is_valid_cell(r, c, g):
+            # Get naive transition
+            naive_transition = naive_transitions[g[r + t.value[0]][c + t.value[1]]]
+            # if invalid, no further checking
+            if naive_transition == TType.INVALID: return naive_transition
+            # refine for platform check
+            ground_cell = GameCell.get_cell_type(r + t.value[0] - 1, c + t.value[1], g) if naive_transition is TType.MOVE else\
+                GameCell.get_cell_type(r - 1, c + (2 * t.value[1]), g)
+            # check if valid platform
+            return naive_transition if CellType.is_safe_ground(ground_cell) else TType.DANGER
+        else:
+            return TType.INVALID
 
-def is_valid_cell(r:int, c:int, g:[[]]):
-    return (0 <= r < len(g)) and (0 <= c < len(g[r]))
-
-class GameCell:
     def __init__(self, r:int, c:int, g:[[]]):
+        self.cell_type = self.get_cell_type(r, c, g)
+        # populated by game map
         self.q_up = 0
         self.q_down = 0
         self.q_left = 0
         self.q_right = 0
         self.v = 0
-        self.t_up = CellType.EMPTY
-        self.t_down = CellType.EMPTY
-        self.t_left = CellType.EMPTY
-        self.t_right = CellType.EMPTY
+        # transition functions between cells
+        self.t_up = self.get_transition_type(r, c, g, Direction.UP)
+        self.t_down = self.get_transition_type(r, c, g, Direction.DOWN)
+        self.t_left = self.get_transition_type(r, c, g, Direction.LEFT)
+        self.t_right = self.get_transition_type(r, c, g, Direction.RIGHT)
 
-    def get_transition_type(self, r:int, c:int, g:[[]]) -> TType:
-        if is_valid_cell(r, c, g):
-            if g[r][c] == '2' or g[r][c] == '3' or g[r][c] == '4' or g[r][c] == '5':
-                pass
-        else:
-            return TType.INVALID
+
 
     def update_v(self, r:int, c:int, g:[[]], reward:[[]]):
         # Value Iteration Algorithm:
@@ -101,6 +152,24 @@ class GameCell:
         else:
             g[r][c] = 0
         pass
+
+class GameMap:
+    def __init__(self, agent:Agent):
+        self.raw_grid = copy.deepcopy(agent.move_grid)
+        self.state_grid = []
+        for r in range(len(self.raw_grid)):
+            self.state_grid.append([])
+            for c in range(len(self.raw_grid[r])):
+                self.state_grid[r].append(GameCell(r, c, self.raw_grid))
+
+
+
+
+def is_valid_cell(r:int, c:int, g:[[]]):
+    """Check if inside the grid"""
+    return (0 <= r < len(g)) and (0 <= c < len(g[r]))
+
+
 
 
 
