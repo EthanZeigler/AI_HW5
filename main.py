@@ -58,7 +58,7 @@ class Agent(threading.Thread):
         ax.yaxis.set_visible(True)
         the_table = ax.table(cellText=game_map.state_grid,
                              loc='center')
-        plt.savefig("/media/sf_Ethan/Desktop/Figure 1.png")
+        plt.savefig("/media/sf_Ethan/Desktop/t_left.png")
 
         sys.exit(-1)
 

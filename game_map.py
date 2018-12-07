@@ -10,8 +10,8 @@ ENEMY_REWARD = -.5
 # Data structures and magic number wrappers
 
 class Direction(Enum):
-    UP     = (1, 0)
-    DOWN   = (-1, 0)
+    UP     = (-1, 0)
+    DOWN   = (1, 0)
     LEFT   = (0, -1)
     RIGHT  = (0, 1)
 
@@ -157,7 +157,7 @@ class GameCell(object):
         pass
 
     def __str__(self) -> str:
-        return self.t_down.__str__().center(15, " ")
+        return self.t_left.__str__().center(15, " ")
 
 
 class GameMap:
