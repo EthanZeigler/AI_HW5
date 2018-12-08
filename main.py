@@ -56,6 +56,7 @@ class Agent(threading.Thread):
         ax = fig.add_subplot(111)
         ax.xaxis.set_visible(True)
         ax.yaxis.set_visible(True)
+        # I deserve to be ridiculed for this...
         the_table = ax.table(cellText=game_map.state_grid,
                              cellColours=[[game_map.state_colors[(game_map.state_grid[r][c]).cell_type]
                                            for c in range(len(game_map.state_grid[r]))]
