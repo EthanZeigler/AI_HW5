@@ -1,0 +1,7 @@
+CSC380-01
+Assignment 5
+
+1.1
+The most relevant topic would be adversarial search. Using a search algorithm is possible, but we are constrained by in-game time.
+
+1.2
