@@ -222,22 +222,27 @@ class GameCell(object):
         # This is making me hate myself.
         # 0 or move or jump based on designated transition function
         self.q_up = 0 if not self.t_up.valid_q() else\
-            (g[r + Direction.UP[0]][c + Direction.UP[1]]).v if self.t_up == TType.MOVE else\
-                (g[r + (2 * Direction.UP[0])][c + (2 * Direction.UP[1])]).v
+            (g[r + Direction.UP.value[0]][c + Direction.UP.value[1]]).v if self.t_up == TType.MOVE else\
+                (g[r + (2 * Direction.UP.value[0])][c + (2 * Direction.UP.value[1])]).v
+        self.q_up = (self.q_up * GAMMA) + reward_values[self.cell_type]
 
         self.q_down = 0 if not self.t_down.valid_q() else \
-            (g[r + Direction.DOWN[0]][c + Direction.DOWN[1]]).v if self.t_down == TType.MOVE else \
-                (g[r + (2 * Direction.DOWN[0])][c + (2 * Direction.DOWN[1])]).v
+            (g[r + Direction.DOWN.value[0]][c + Direction.DOWN.value[1]]).v if self.t_down == TType.MOVE else \
+                (g[r + (2 * Direction.DOWN.value[0])][c + (2 * Direction.DOWN.value[1])]).v
+        self.q_down = (self.q_down * GAMMA) + reward_values[self.cell_type]
 
         self.q_left = 0 if not self.t_left.valid_q() else \
-            (g[r + Direction.LEFT[0]][c + Direction.LEFT[1]]).v if self.t_left == TType.MOVE else \
-                (g[r + (2 * Direction.LEFT[0])][c + (2 * Direction.LEFT[1])]).v
+            (g[r + Direction.LEFT.value[0]][c + Direction.LEFT.value[1]]).v if self.t_left == TType.MOVE else \
+                (g[r + (2 * Direction.LEFT.value[0])][c + (2 * Direction.LEFT.value[1])]).v
+        self.q_left = (self.q_left * GAMMA) + reward_values[self.cell_type]
 
         self.q_right = 0 if not self.t_right.valid_q() else \
-            (g[r + Direction.RIGHT[0]][c + Direction.RIGHT[1]]).v if self.t_right == TType.MOVE else \
-                (g[r + (2 * Direction.RIGHT[0])][c + (2 * Direction.RIGHT[1])]).v
+            (g[r + Direction.RIGHT.value[0]][c + Direction.RIGHT.value[1]]).v if self.t_right == TType.MOVE else \
+                (g[r + (2 * Direction.RIGHT.value[0])][c + (2 * Direction.RIGHT.value[1])]).v
+        self.q_right = (self.q_right * GAMMA) + reward_values[self.cell_type]
 
-
+        self.v = max(self.q_up, self.q_down, self.q_left, self.q_right)
+        print(self.v)
 
     def __str__(self) -> str:
         return self.t_down.__str__().center(15, " ")
@@ -258,6 +263,16 @@ class GameMap:
                     CellType.NEEDLE: "xkcd:orangish",
                     CellType.SPAWN_CELL: "xkcd:dark sand"}
 
+    def q_iteration(self, n:int):
+        """Runs q_iteration on the state grid. raw_grid will not be affected"""
+        for i in range(n):
+            new_grid = copy.deepcopy(self.state_grid)
+            for r in range(len(self.raw_grid)):
+                for c in range(len(self.raw_grid[r])):
+                    new_grid[r][c].update_v(r, c, self.state_grid)
+            self.state_grid = new_grid
+
+
     def __init__(self, agent:Agent):
         self.raw_grid = copy.deepcopy(agent.move_grid)
         self.state_grid = []
@@ -272,10 +287,6 @@ class GameMap:
 def is_valid_cell(r:int, c:int, g:[[]]):
     """Check if inside the grid"""
     return (0 <= r < len(g)) and (0 <= c < len(g[r]))
-
-
-
-
 
 
 # Stage Information: Each stage is (rows x cols) = (12 x 20) cells

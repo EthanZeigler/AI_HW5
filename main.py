@@ -2,10 +2,12 @@ import arcade
 import game_core
 import threading
 import time
+import math
 #import os
 #import pygame
 import game_map as ai
 from matplotlib import pyplot as plt
+from numpy import interp
 import sys
 
 
@@ -49,8 +51,9 @@ class Agent(threading.Thread):
         # b	bonus (1000 points)
         # c	enemy1 (always appear on the right)
         game_map = ai.GameMap(self)
-        for line in game_map.state_grid:
-            print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
+        # for line in game_map.state_grid:
+        #     print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
+        game_map.q_iteration(10)
 
         fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
         ax = fig.add_subplot(111)
@@ -58,11 +61,14 @@ class Agent(threading.Thread):
         ax.yaxis.set_visible(True)
         # I deserve to be ridiculed for this...
         the_table = ax.table(cellText=game_map.state_grid,
-                             cellColours=[[game_map.state_colors[(game_map.state_grid[r][c]).cell_type]
-                                           for c in range(len(game_map.state_grid[r]))]
-                                           for r in range(len(game_map.state_grid))],
+                             # cellColours=[[game_map.state_colors[(game_map.state_grid[r][c]).cell_type]
+                                           # for c in range(len(game_map.state_grid[r]))]
+                                           # for r in range(len(game_map.state_grid))],
+                             cellColours=[[(interp(game_map.state_grid[r][c].v,[-1, 1],[1, 0]), interp(game_map.state_grid[r][c].v,[-1, 1],[0, 1]), 0)
+                                        for c in range(len(game_map.state_grid[r]))]
+                                        for r in range(len(game_map.state_grid))],
                              loc='center')
-        plt.savefig("t_down_inspect.png")
+        plt.savefig("v.png")
 
         sys.exit(-1)
 
@@ -118,7 +124,7 @@ class Agent(threading.Thread):
 
 
 def main():
-    ag = Agent(1, "My Agent", 1, True)
+    ag = Agent(1, "to lose my mind", 1, True)
     ag.game = game_core.GameMain()
     ag.start()
 
