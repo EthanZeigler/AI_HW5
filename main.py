@@ -61,7 +61,7 @@ class Agent(threading.Thread):
         # for line in game_map.state_grid:
         #     print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
         #This performs the q iteration to get the v values after each move
-        game_map.q_iteration(40)
+        game_map.q_iteration(30)
 
         #Prints the complete v grid
         for r in range(12):
@@ -152,9 +152,15 @@ class Agent(threading.Thread):
 
         #If the move is valid, then update v value for the move, otherwise v value will not be considered
         if rValid & (self.tanuki_last != 1):
-            vRight = game_map.state_grid[self.tanuki_r][self.tanuki_c + 1].v
+            if rJump:
+                vRight = game_map.state_grid[self.tanuki_r][self.tanuki_c + 2].v
+            else:
+                vRight = game_map.state_grid[self.tanuki_r][self.tanuki_c + 1].v
         if lValid & (self.tanuki_last != 2):
-            vLeft = game_map.state_grid[self.tanuki_r][self.tanuki_c - 1].v
+            if lJump:
+                vLeft = game_map.state_grid[self.tanuki_r][self.tanuki_c - 2].v
+            else:
+                vLeft = game_map.state_grid[self.tanuki_r][self.tanuki_c - 1].v
         if uValid & (self.tanuki_last != 4):
             vUp = game_map.state_grid[self.tanuki_r - 1][self.tanuki_c].v
         if dValid & (self.tanuki_last != 3):
