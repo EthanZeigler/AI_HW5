@@ -62,8 +62,8 @@ class Agent(threading.Thread):
 
         game_map.q_iteration(40)
 
-        for c in range(20):
-            for r in range(12):
+        for r in range(12):
+            for c in range(20):
                 print(game_map.state_grid[r][c].v, end=" ")
             print()
         print()
