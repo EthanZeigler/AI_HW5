@@ -133,14 +133,14 @@ class Agent(threading.Thread):
 
         #This will perform the action for the given state and mdp analysis
         if (vLeft == max(vLeft, vRight, vDown, vUp)):
-            if not self.game.tanuki.isGoingLeft:
+            if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
                 self.game.on_key_press(arcade.key.LEFT, 0)
             self.game.on_key_press(arcade.key.LEFT, 0)
             self.tanuki_last = 1
 
 
         if (vRight == max(vLeft, vRight, vDown, vUp)):
-            if self.game.tanuki.isGoingLeft:
+            if self.game.tanuki.isGoingLeft or self.game.tanuki.isGoingUpDown:
                 self.game.on_key_press(arcade.key.RIGHT, 0)
             self.game.on_key_press(arcade.key.RIGHT, 0)
             self.tanuki_last = 2
@@ -213,6 +213,9 @@ class Agent(threading.Thread):
             # We must allow enough CPU time for the main game application
             # Polling interval can be reduced if you don't display the grid information
             time.sleep(0.5)
+
+            if self.game.isGameOver or self.isGameClear:
+                break
 
         print("Exiting " + self.name)
 

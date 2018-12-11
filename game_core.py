@@ -347,18 +347,22 @@ class GameMain(arcade.Window):
             if self.move_grid[gridr][gridc] == 8:
                 self.total_score += 100
                 self.plat_grid[gridr][gridc].isActive = False
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 9:
                 self.total_score += 500
                 self.plat_grid[gridr][gridc].isActive = False
                 self.tanuki.ateSmallBonus = True
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 10:
                 self.total_score += 1000
                 self.plat_grid[gridr][gridc].isActive = False
                 self.tanuki.ateBigBonus = True
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 11:
                 self.plat_grid[gridr][gridc].isActive = False
                 if not self.isDisableEnemy:
                     self.enemy_list[-1].isActive = True  # hidden enemy is always the last one in the list
+                self.move_grid[gridr][gridc] = 1
             else:
                 pass
 
