@@ -5,3 +5,13 @@ Assignment 5
 The most relevant topic would be adversarial search. Using a search algorithm is possible, but we are constrained by in-game time.
 
 1.2
+
+
+1.3
+For our implementation, we used Q value implementation.
+
+1.4
+(implementation)
+
+2.1
+The Makrov Decision Making Process is used to maximize the sum of rewards in a game.
