@@ -36,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="game_core.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="game_core.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game_core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2059">
-              <caret line="71" column="35" lean-forward="false" selection-start-line="71" selection-start-column="35" selection-end-line="71" selection-end-column="35" />
+            <state relative-caret-position="-1537">
+              <caret line="19" column="30" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="19" selection-end-column="30" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -60,11 +60,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="851">
-              <caret line="222" column="0" lean-forward="true" selection-start-line="222" selection-start-column="0" selection-end-line="222" selection-end-column="0" />
+            <state relative-caret-position="184">
+              <caret line="256" column="81" lean-forward="false" selection-start-line="256" selection-start-column="81" selection-end-line="256" selection-end-column="81" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -125,8 +125,8 @@
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
         <option value="$PROJECT_DIR$/game_map.py" />
         <option value="$PROJECT_DIR$/game_object.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/game_core.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -641,16 +641,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="851">
-          <caret line="222" column="0" lean-forward="true" selection-start-line="222" selection-start-column="0" selection-end-line="222" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/game_object.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-7791">
@@ -661,8 +651,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/game_core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2059">
-          <caret line="71" column="35" lean-forward="false" selection-start-line="71" selection-start-column="35" selection-end-line="71" selection-end-column="35" />
+        <state relative-caret-position="-1537">
+          <caret line="19" column="30" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="19" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="256" column="81" lean-forward="false" selection-start-line="256" selection-start-column="81" selection-end-line="256" selection-end-column="81" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

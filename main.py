@@ -60,9 +60,10 @@ class Agent(threading.Thread):
 
         # for line in game_map.state_grid:
         #     print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
-
+        #This performs the q iteration to get the v values after each move
         game_map.q_iteration(40)
 
+        #Prints the complete v grid
         for r in range(12):
             for c in range(20):
                 print(game_map.state_grid[r][c].v, end=" ")
@@ -106,6 +107,7 @@ class Agent(threading.Thread):
             isValid = str(game_map.state_grid[self.tanuki_r][self.tanuki_c - 1])
             if "MOVE" in isValid:
                 lValid = True
+            #Deeper check to see if spot is jumpable (needle or pitfall)
             isNeedle = str(game_map.state_grid[self.tanuki_r + 1][self.tanuki_c - 1].cell_type)
             if "NEEDLE" in isNeedle:
                 lValid = True
@@ -122,6 +124,7 @@ class Agent(threading.Thread):
             isValid = str(game_map.state_grid[self.tanuki_r][self.tanuki_c + 1])
             if "MOVE" in isValid:
                 rValid = True
+            # Deeper check to see if spot is jumpable (needle or pitfall)
             isNeedle = str(game_map.state_grid[self.tanuki_r + 1][self.tanuki_c + 1].cell_type)
             if "NEEDLE" in isNeedle:
                 rValid = True
@@ -147,7 +150,7 @@ class Agent(threading.Thread):
                 dValid = True
 
 
-        #If the move is valid, then update v value for the move
+        #If the move is valid, then update v value for the move, otherwise v value will not be considered
         if rValid & (self.tanuki_last != 1):
             vRight = game_map.state_grid[self.tanuki_r][self.tanuki_c + 1].v
         if lValid & (self.tanuki_last != 2):
@@ -162,7 +165,7 @@ class Agent(threading.Thread):
         print(vUp)
         print(vDown)
 
-        #This will perform the action for the given state and mdp analysis
+        #This will perform the chosen action for the given state and mdp analysis
         if (vLeft == max(vLeft, vRight, vDown, vUp)):
             if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
                 self.game.on_key_press(arcade.key.LEFT, 0)
@@ -227,7 +230,7 @@ class Agent(threading.Thread):
                 self.total_score, self.total_time, self.total_life, self.tanuki_r, self.tanuki_c \
                 = self.game.get_game_state()
 
-
+            #Row coordinate regulizer, code doesn't work without it
             self.tanuki_r = self.tanuki_r - 1
 
             self.ai_function()
@@ -251,6 +254,7 @@ class Agent(threading.Thread):
             # Polling interval can be reduced if you don't display the grid information
             time.sleep(0.5)
 
+            #Gameover check so that code will stop when bot is finished with game
             if self.game.isGameOver or self.isGameClear:
                 break
 
