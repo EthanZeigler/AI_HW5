@@ -37,6 +37,7 @@ class Agent(threading.Thread):
 
 
 
+
     #############################################################
     #      YOUR SUPER COOL ARTIFICIAL INTELLIGENCE HERE!!!      #
     #############################################################
@@ -95,18 +96,45 @@ class Agent(threading.Thread):
         dValid = False
         uValid = False
 
+        #Temp values for checking whether to jump
+        lJump = False
+        rJump = False
+
 
         #Check whether each move is possible in current possition
         if self.tanuki_c > 0:
             isValid = str(game_map.state_grid[self.tanuki_r][self.tanuki_c - 1])
             if "MOVE" in isValid:
                 lValid = True
-
+            isNeedle = str(game_map.state_grid[self.tanuki_r + 1][self.tanuki_c - 1].cell_type)
+            if "NEEDLE" in isNeedle:
+                lValid = True
+                lJump = True
+            if self.tanuki_c > 1:
+                isDrop = str(game_map.state_grid[self.tanuki_r + 2][self.tanuki_c - 1].cell_type)
+                isPlat = str(game_map.state_grid[self.tanuki_r + 2][self.tanuki_c - 2].cell_type)
+                if "AIR" in isDrop:
+                    if "PLATFORM" in isPlat:
+                        lValid = True;
+                        lJump = True
 
         if self.tanuki_c < 19:
             isValid = str(game_map.state_grid[self.tanuki_r][self.tanuki_c + 1])
             if "MOVE" in isValid:
                 rValid = True
+            isNeedle = str(game_map.state_grid[self.tanuki_r + 1][self.tanuki_c + 1].cell_type)
+            if "NEEDLE" in isNeedle:
+                rValid = True
+                rJump = True
+
+            if self.tanuki_c < 18:
+                isDrop = str(game_map.state_grid[self.tanuki_r + 2][self.tanuki_c + 1].cell_type)
+                isPlat = str(game_map.state_grid[self.tanuki_r + 2][self.tanuki_c + 2].cell_type)
+                if "AIR" in isDrop:
+                    if "PLATFORM" in isPlat:
+                        rValid = True
+                        rJump = True
+
 
         if self.tanuki_r > 0:
             isValid = str(game_map.state_grid[self.tanuki_r - 1][self.tanuki_c])
@@ -129,20 +157,29 @@ class Agent(threading.Thread):
         if dValid & (self.tanuki_last != 3):
             vDown = game_map.state_grid[self.tanuki_r + 1][self.tanuki_c].v
 
-
+        print(vLeft)
+        print(vRight)
+        print(vUp)
+        print(vDown)
 
         #This will perform the action for the given state and mdp analysis
         if (vLeft == max(vLeft, vRight, vDown, vUp)):
             if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
                 self.game.on_key_press(arcade.key.LEFT, 0)
-            self.game.on_key_press(arcade.key.LEFT, 0)
+            if lJump:
+                self.game.on_key_press(arcade.key.SPACE, 0)
+            else:
+                self.game.on_key_press(arcade.key.LEFT, 0)
             self.tanuki_last = 1
 
 
         if (vRight == max(vLeft, vRight, vDown, vUp)):
             if self.game.tanuki.isGoingLeft or self.game.tanuki.isGoingUpDown:
                 self.game.on_key_press(arcade.key.RIGHT, 0)
-            self.game.on_key_press(arcade.key.RIGHT, 0)
+            if rJump:
+                self.game.on_key_press(arcade.key.SPACE, 0)
+            else:
+                self.game.on_key_press(arcade.key.RIGHT, 0)
             self.tanuki_last = 2
 
 

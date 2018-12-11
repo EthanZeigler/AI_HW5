@@ -1,6 +1,6 @@
 import arcade
 import game_object as gobj
-import game_data_mod2 as gd
+import game_data_mod3 as gd
 import pyglet
 import timeit
 from datetime import datetime
@@ -69,7 +69,7 @@ class GameMain(arcade.Window):
         self.all_enemy_sprites_list = []
         self.enemy_list = []
         self.tanuki = []
-        self.tanuki_r = ROW_COUNT-2
+        self.tanuki_r = ROW_COUNT-1
         self.tanuki_c = COL_COUNT-1
 
     def get_game_state(self):
