@@ -1,6 +1,6 @@
 import arcade
 import game_object as gobj
-import game_data_mod3 as gd
+import game_data_mod2 as gd
 import pyglet
 import timeit
 from datetime import datetime
@@ -147,8 +147,8 @@ class GameMain(arcade.Window):
         # Tanuki
         self.tanuki = gobj.Tanuki()
         self.tanuki.set_gridRC(ROW_COUNT-2, COL_COUNT-1)
-        self.tanuki_r = ROW_COUNT-2
-        self.tanuki_c = COL_COUNT - 2
+        self.tanuki_r = ROW_COUNT - 2
+        self.tanuki_c = COL_COUNT - 1
 
     def load_stage(self, stage_num):
         for r in range(ROW_COUNT):
