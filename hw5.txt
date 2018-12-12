@@ -2,6 +2,34 @@ CSC380-01
 Assignment 5
 
 1.1
-The most relevant topic would be adversarial search. Using a search algorithm is possible, but we are constrained by in-game time.
+The most relevant topic would be adversarial search. Using a search algorithm is possible, but we are constrained by in-game time and the complexity to create such an algorithm where defining a utility function isn't very straight-forward.
 
 1.2
+For the very basic approach like this, a BFS or DFS would be the easiest and most efficient solution. It's relatively quick and will always find the goal if it exists.
+
+However, we will be using MDP and V-value iteration for our actual implementation, and the reason is that while these algorithms would be very efficient for this homework assignment specifically, it does not account for dangers that will exist in the final project. By using V-value iteration, we are implementing a large part of our final project while still completing this homework assignment successfully.
+
+1.3
+We used a grid of GameCell objects containing q values, v values, the type of the cell (platform, air, ...), and finally if and how one could move from cell to cell as in jump or move in a direction. These were all combined to create a grid of cells that can easily avoid enemies while collecting the fruit around the stage.
+
+1.4
+👍
+
+2.1
+Our implementation of v-value iteration finds the most densely compacted fruit based on the current location of the raccoon thing. It will be attracted to nearby fruit and bonuses, thereby taking a relatively efficient route on collecting all the points given this heuristic as we haven't solved the travelling salesman problem, sadly. 
+
+2.2
+This is 1.4?
+👍
+
+2.3
+The ideal would be to have no restrictions, but with v-value the best idea would be to set fruit to be a very high reward while setting the reward for bonuses much lower. This will lead to determining efficient paths for reaching all the fruits while still giving some incentive towards getting bonuses along the way. We'd want to use the time and or battery we have to get the largest score we can, which can be done by changing around reward values until we optimize our score.
+
+3.1
+The chage would be that cells with enemies in them would recieve a terminal state and a negative reward, causing our agent to avoid them. When they move, the value grid will have to update for their new locations.
+
+3.2
+👍
+
+3.3
+We'd add negative rewards to the cells with enemies and the agent will avoid it due to reduced v values.
