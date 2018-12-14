@@ -3,7 +3,7 @@ import copy
 from main import Agent
 
 # MDP Values and costs
-GAMMA = 0.98
+GAMMA = 0.9
 BONUS_LOW_REWARD = .5
 BONUS_HIGH_REWARD = .7
 BONUS_ENEMY_REWARD = -.1
@@ -163,7 +163,7 @@ class GameCell(object):
             # if invalid, no further checking
             if naive_transition == TType.INVALID: return naive_transition
             # refine for platform check with additional torture and messy code on the side
-            ground_cell = GameCell.get_cell_type(r + t.value[0] + Direction.DOWN.value[0],
+            ground_cell = self.get_cell_type(r + t.value[0] + Direction.DOWN.value[0],
                                                  c + t.value[1] + Direction.DOWN.value[1], g)\
                                         if naive_transition is TType.MOVE else\
                                             GameCell.get_cell_type(r + Direction.DOWN.value[0], c + (2 * t.value[1]), g)
@@ -221,8 +221,8 @@ class GameCell(object):
 
         # This is making me hate myself.
         # 0 or move or jump based on designated transition function
-        self.q_up = 0 if not self.t_up.valid_q() else\
-            (g[r + Direction.UP.value[0]][c + Direction.UP.value[1]]).v if self.t_up == TType.MOVE else\
+        self.q_up = 0 if not self.t_up.valid_q() else \
+            (g[r + Direction.UP.value[0]][c + Direction.UP.value[1]]).v if self.t_up == TType.MOVE else \
                 (g[r + (2 * Direction.UP.value[0])][c + (2 * Direction.UP.value[1])]).v
         self.q_up = (self.q_up * GAMMA) + reward_values[self.cell_type]
 
@@ -242,7 +242,8 @@ class GameCell(object):
         self.q_right = (self.q_right * GAMMA) + reward_values[self.cell_type]
 
         self.v = max(self.q_up, self.q_down, self.q_left, self.q_right)
-        print(self.v)
+
+
 
     def __str__(self) -> str:
         return self.t_down.__str__().center(15, " ")
@@ -270,7 +271,11 @@ class GameMap:
             for r in range(len(self.raw_grid)):
                 for c in range(len(self.raw_grid[r])):
                     new_grid[r][c].update_v(r, c, self.state_grid)
+
+
             self.state_grid = new_grid
+
+
 
 
     def __init__(self, agent:Agent):

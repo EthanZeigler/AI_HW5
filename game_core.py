@@ -69,7 +69,7 @@ class GameMain(arcade.Window):
         self.all_enemy_sprites_list = []
         self.enemy_list = []
         self.tanuki = []
-        self.tanuki_r = ROW_COUNT-2
+        self.tanuki_r = ROW_COUNT-1
         self.tanuki_c = COL_COUNT-1
 
     def get_game_state(self):
@@ -147,8 +147,8 @@ class GameMain(arcade.Window):
         # Tanuki
         self.tanuki = gobj.Tanuki()
         self.tanuki.set_gridRC(ROW_COUNT-2, COL_COUNT-1)
-        self.tanuki_r = ROW_COUNT-2
-        self.tanuki_c = COL_COUNT - 2
+        self.tanuki_r = ROW_COUNT - 2
+        self.tanuki_c = COL_COUNT - 1
 
     def load_stage(self, stage_num):
         for r in range(ROW_COUNT):
@@ -347,18 +347,22 @@ class GameMain(arcade.Window):
             if self.move_grid[gridr][gridc] == 8:
                 self.total_score += 100
                 self.plat_grid[gridr][gridc].isActive = False
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 9:
                 self.total_score += 500
                 self.plat_grid[gridr][gridc].isActive = False
                 self.tanuki.ateSmallBonus = True
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 10:
                 self.total_score += 1000
                 self.plat_grid[gridr][gridc].isActive = False
                 self.tanuki.ateBigBonus = True
+                self.move_grid[gridr][gridc] = 1
             elif self.move_grid[gridr][gridc] == 11:
                 self.plat_grid[gridr][gridc].isActive = False
                 if not self.isDisableEnemy:
                     self.enemy_list[-1].isActive = True  # hidden enemy is always the last one in the list
+                self.move_grid[gridr][gridc] = 1
             else:
                 pass
 
