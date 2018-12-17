@@ -3,14 +3,21 @@ import game_core
 import threading
 import time
 import game_map as ai
-from matplotlib import pyplot as plt
+import numpy
 from numpy import interp
+from matplotlib import pyplot as plt
+import collections
 import sys
-
+import copy
 
 class Agent(threading.Thread):
 
     map = None
+    counter = 0
+    oldScore = -1
+    old_stage = -1
+    my_kill_grid = []
+    false_list = None
 
     def __init__(self, threadID, name, counter, show_grid_info=False):
         threading.Thread.__init__(self)
@@ -33,6 +40,7 @@ class Agent(threading.Thread):
         self.tanuki_c = 0
         #Define our own tracker of the last move the tanuki made
         self.tanuki_last = 0
+        self.enemy_list = []
 
 
 
@@ -41,6 +49,12 @@ class Agent(threading.Thread):
     #      YOUR SUPER COOL ARTIFICIAL INTELLIGENCE HERE!!!      #
     #############################################################
     def ai_function(self):
+        # print()
+        # print(self.counter)
+        # self.counter += 1
+
+        if self.false_list is None:
+            self.false_list = [[False for _ in range(len(self.kill_grid[0]))] for _ in range(len(self.kill_grid))]
         # To send a key stroke to the game, use self.game.on_key_press() method
         # Stage Information: Each stage is (rows x cols) = (12 x 20) cells
         # .	empty
@@ -54,25 +68,59 @@ class Agent(threading.Thread):
         # a	bonus (500 points)
         # b	bonus (1000 points)
         # c	enemy1 (always appear on the right)
-        self.map = ai.GameMap(self)
+        # if self.map is None:
+        #     self.map = ai.GameMap(self)
+        #     self.map.q_iteration(30)
+        # else:
+        #     print('lets go ', self.counter)
+        #     self.counter += 1
+        self.my_kill_grid = copy.deepcopy(self.false_list)
+        for enemy in self.enemy_list:
+            if enemy.isActive:
+                r, c = enemy.get_gridRC()
+                self.my_kill_grid[r][c] = True
 
+
+
+        # if self.old_kill_grid:
+        #     for r in range(len(self.kill_grid)):
+        #         for c in range(len(self.kill_grid[r])):
+        #             if self.kill_grid[r][c] != self.old_kill_grid[r][c]:
+        #                 print('fail @ ', r, ' ', c)
+        #                 flag = True
+        #                 break
+        #         else:
+        #             continue
+        #         break
+        # else:
+        #     print('init old')
+
+        if self.oldScore != self.total_score\
+                or self.old_stage != self.current_stage:
+            self.map = ai.GameMap(self)
+            if self.old_stage != self.current_stage:
+                self.old_stage = self.current_stage
+                self.map.redo_map()
+            self.map.q_iteration(30, self.my_kill_grid)
+            # print(self.my_kill_grid)
 
         # for line in game_map.state_grid:
         #     print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
         #This performs the q iteration to get the v values after each move
-        self.map.q_iteration(30)
+
+
 
         # fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
         # ax = fig.add_subplot(111)
         # # bx = fig.add_subplot(123)
         # # I deserve to be ridiculed for this...
         # the_table = ax.table(cellText=self.map.state_grid,
-        #                      cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
-        #                                    for c in range(len(self.map.state_grid[r]))]
-        #                                    for r in range(len(self.map.state_grid))],
-        #                      # cellColours=[[(interp(self.map.state_grid[r][c].v,[-1, 1],[1, 0]), interp(self.map.state_grid[r][c].v,[-1, 1],[0, 1]), 0)
-        #                      #            for c in range(len(self.map.state_grid[r]))]
-        #                      #            for r in range(len(self.map.state_grid))],
+        #                      # cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
+        #                      #               for c in range(len(self.map.state_grid[r]))]
+        #                      #               for r in range(len(self.map.state_grid))],
+        #                      cellColours=[[(interp(self.map.state_grid[r][c].v,[-1, 1],[1, 0]), interp(self.map.state_grid[r][c].v,[-1, 1],[0, 1]), 0)
+        #                                 for c in range(len(self.map.state_grid[r]))]
+        #                                 for r in range(len(self.map.state_grid))],
         #                      loc='center')
         #
         # # the_other_table = bx.table(cellText=self.map.state_grid,
@@ -114,6 +162,7 @@ class Agent(threading.Thread):
             v_right = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c + 1].v
         if tan_cell.t_right == ai.TType.JUMP:
             v_right = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c + 2].v
+
 
         # This will perform the chosen action for the given state and mdp analysis
         # if vLeft == max(vLeft, vRight, vDown, vUp):
@@ -232,10 +281,10 @@ class Agent(threading.Thread):
         #     vDown = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c].v
         #
 
-        print('left: ', v_left, ' ', tan_cell.t_left)
-        print('right: ', v_right, ' ', tan_cell.t_right)
-        print('up: ', v_up, ' ', tan_cell.t_up)
-        print('down: ', v_down, ' ', tan_cell.t_down)
+        # print('left: ', v_left, ' ', tan_cell.t_left)
+        # print('right: ', v_right, ' ', tan_cell.t_right)
+        # print('up: ', v_up, ' ', tan_cell.t_up)
+        # print('down: ', v_down, ' ', tan_cell.t_down)
 
 
         #This will perform the chosen action for the given state and mdp analysis
@@ -270,7 +319,6 @@ class Agent(threading.Thread):
 
 
 
-
     def run(self):
         print("Starting " + self.name)
 
@@ -294,7 +342,7 @@ class Agent(threading.Thread):
             # RETRIEVE CURRENT GAME STATE
             self.move_grid, self.kill_grid, \
                 self.isGameClear, self.isGameOver, self.current_stage, self.time_limit, \
-                self.total_score, self.total_time, self.total_life, self.tanuki_r, self.tanuki_c \
+                self.total_score, self.total_time, self.total_life, self.tanuki_r, self.tanuki_c, self.enemy_list\
                 = self.game.get_game_state()
 
             #Row coordinate regulizer, code doesn't work without it
@@ -319,7 +367,7 @@ class Agent(threading.Thread):
 
             # We must allow enough CPU time for the main game application
             # Polling interval can be reduced if you don't display the grid information
-            time.sleep(0.5)
+            time.sleep(0.08)
 
             #Gameover check so that code will stop when bot is finished with game
             if self.game.isGameOver or self.isGameClear:

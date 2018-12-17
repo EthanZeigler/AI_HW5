@@ -198,7 +198,7 @@ class GameCell(object):
 
 
 
-    def update_v(self, r:int, c:int, g:[[]]):
+    def update_v(self, r:int, c:int, g:[[]], e:[]):
         # Value Iteration Algorithm:
         # Step 1: Initialize V as some matrix (can be all zeroes; can be based on some intelligent estimate)
         #
@@ -271,13 +271,16 @@ class GameCell(object):
                     down = g[r+1][c].v
 
                 self.v = max(left, right, down) * GAMMA + reward_values[self.cell_type]
+                if e[r][c]:
+                    self.v -= ENEMY_REWARD
 
 
     def __str__(self) -> str:
-        return self.t_left.__str__().center(15, " ")
+        return self.v.__str__().center(15, " ")
 
 
 class GameMap:
+    state_grid = None
     state_colors = {CellType.BONUS_DANGER: 'xkcd:pale yellow',
                     CellType.BONUS_HIGH: 'xkcd:kelly green',
                     CellType.BONUS_LOW: 'xkcd:kelly green',
@@ -293,26 +296,35 @@ class GameMap:
                     CellType.SPAWN_CELL: "xkcd:dark sand"}
 
 
-    def q_iteration(self, n:int):
+    def q_iteration(self, n:int, e:[]):
         """Runs q_iteration on the state grid. raw_grid will not be affected"""
+        self.kill_map = e
         for i in range(n):
             new_grid = copy.deepcopy(self.state_grid)
             for r in range(len(self.raw_grid)):
                 for c in range(len(self.raw_grid[r])):
-                    new_grid[r][c].update_v(r, c, self.state_grid)
+                    new_grid[r][c].update_v(r, c, self.state_grid, e)
             self.state_grid = new_grid
 
 
 
 
-    def __init__(self, agent:Agent):
-        self.raw_grid = copy.deepcopy(agent.move_grid)
+    def redo_map(self):
         self.state_grid = []
         for r in range(len(self.raw_grid)):
             self.state_grid.append([])
             for c in range(len(self.raw_grid[r])):
                 self.state_grid[r].append(GameCell(r, c, self.raw_grid))
 
+    def __init__(self, agent:Agent):
+        self.kill_map = []
+        self.raw_grid = copy.deepcopy(agent.move_grid)
+        if self.state_grid is None:
+            self.redo_map()
+        else:
+            for r in range(len(self.state_grid)):
+                for c in range(len(self.state_grid[r])):
+                    self.state_grid[r][c].v = 0
 
 
 

@@ -1,6 +1,6 @@
 import arcade
 import game_object as gobj
-import game_data_mod3 as gd
+import game_data as gd
 import pyglet
 import timeit
 from datetime import datetime
@@ -75,7 +75,7 @@ class GameMain(arcade.Window):
     def get_game_state(self):
         return self.move_grid, self.kill_grid, \
                self.isGameClear, self.isGameOver, self.current_stage, self.time_limit, \
-               self.total_score, self.total_time, self.total_life, self.tanuki_r, self.tanuki_c
+               self.total_score, self.total_time, self.total_life, self.tanuki_r, self.tanuki_c, self.enemy_list
 
     def replay(self, replay_file_name=""):
         if self.isRecording and self.isReplaying:
