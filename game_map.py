@@ -8,7 +8,7 @@ BONUS_LOW_REWARD = .5
 BONUS_HIGH_REWARD = .7
 BONUS_ENEMY_REWARD = -.1
 FRUIT_REWARD = 1
-ENEMY_REWARD = -1.5
+ENEMY_REWARD = -2.5
 
 
 # Data structures and magic number wrappers
@@ -186,7 +186,7 @@ class GameCell(object):
         else:
             return TType.INVALID
 
-    def __init__(self, r:int, c:int, g:[[]]):
+    def __init__(self, r:int, c:int, g:[[]], e:[]):
         self.cell_type = self.get_cell_type(r, c, g)
         # populated by game map
         self.v = 0
@@ -195,10 +195,11 @@ class GameCell(object):
         self.t_down = self.get_transition_type(r, c, g, Direction.DOWN)
         self.t_left = self.get_transition_type(r, c, g, Direction.LEFT)
         self.t_right = self.get_transition_type(r, c, g, Direction.RIGHT)
+        self.has_enemy = e[r][c]
 
 
 
-    def update_v(self, r:int, c:int, g:[[]], e:[]):
+    def update_v(self, r:int, c:int, g:[[]], e:[], i:int):
         # Value Iteration Algorithm:
         # Step 1: Initialize V as some matrix (can be all zeroes; can be based on some intelligent estimate)
         #
@@ -225,58 +226,62 @@ class GameCell(object):
 
         # check if cell can have a q value
         #print('evaluate: ', self.cell_type)
-        if self.cell_type.valid_q_transition():
-            #print("pass eval")
-            # ladder cases
-            if self.cell_type == CellType.LADDER:
-                #print('is ladder')
-                # is ladder below (move up and down guarenteed)
-                if g[r+1][c].cell_type == CellType.LADDER:
-                    self.v = max(g[r-1][c].v, g[r+1][c].v) * GAMMA
-                # on floor (move left, right, up)
-                else:
+        self.has_enemy = e[r][c]
+        if e[r][c]:
+            self.v = ENEMY_REWARD
+        elif reward_values[self.cell_type] != 0:
+            self.v = reward_values[self.cell_type]
+        else:
+
+            if self.cell_type.valid_q_transition():
+                #print("pass eval")
+                # ladder cases
+                if self.cell_type == CellType.LADDER:
+                    #print('is ladder')
+                    # is ladder below (move up and down guarenteed)
+                    if g[r+1][c].cell_type == CellType.LADDER:
+                        self.v = max(g[r-1][c].v, g[r+1][c].v) * GAMMA
+                    # on floor (move left, right, up)
+                    else:
+                        left = 0
+                        right = 0
+                        up = g[r-1][c].v
+                        if self.t_left == TType.MOVE:
+                            left = g[r][c-1].v
+                        elif g[r][c].t_left == TType.JUMP:
+                            left = g[r][c-2].v
+
+                        if self.t_right == TType.MOVE:
+                            right = g[r][c+1].v
+                        elif self.t_right == TType.JUMP:
+                            right = g[r][c+2].v
+
+
+                        self.v = max(left, right, up) * GAMMA
+                # not ladder cases, ground below
+                elif g[r+1][c].cell_type.is_safe_ground():
+                    #print('isnt ladder. is ', self.cell_type)
                     left = 0
                     right = 0
-                    up = g[r-1][c].v
+                    down = 0
                     if self.t_left == TType.MOVE:
-                        left = g[r][c-1].v
-                    elif g[r][c].t_left == TType.JUMP:
-                        left = g[r][c-2].v
+                        left = g[r][c - 1].v
+                    elif self.t_left == TType.JUMP:
+                        left = g[r][c - 2].v
 
                     if self.t_right == TType.MOVE:
-                        right = g[r][c+1].v
+                        right = g[r][c + 1].v
                     elif self.t_right == TType.JUMP:
-                        right = g[r][c+2].v
+                        right = g[r][c + 2].v
 
-
-                    self.v = max(left, right, up) * GAMMA
-            # not ladder cases, ground below
-            elif g[r+1][c].cell_type.is_safe_ground():
-                #print('isnt ladder. is ', self.cell_type)
-                left = 0
-                right = 0
-                down = 0
-                if self.t_left == TType.MOVE:
-                    left = g[r][c - 1].v
-                elif self.t_left == TType.JUMP:
-                    left = g[r][c - 2].v
-
-                if self.t_right == TType.MOVE:
-                    right = g[r][c + 1].v
-                elif self.t_right == TType.JUMP:
-                    right = g[r][c + 2].v
-
-                # add in down if applicable
-                if g[r+1][c].cell_type == CellType.LADDER:
-                    down = g[r+1][c].v
-
-                self.v = max(left, right, down) * GAMMA + reward_values[self.cell_type]
-                if e[r][c]:
-                    self.v -= ENEMY_REWARD
+                    # add in down if applicable
+                    if g[r+1][c].cell_type == CellType.LADDER:
+                        down = g[r+1][c].v
+                    self.v = max(left, right, down) * GAMMA
 
 
     def __str__(self) -> str:
-        return self.v.__str__().center(15, " ")
+        return (self.v.__str__() + ' ' + self.has_enemy.__str__()).center(15, " ")
 
 
 class GameMap:
@@ -303,24 +308,24 @@ class GameMap:
             new_grid = copy.deepcopy(self.state_grid)
             for r in range(len(self.raw_grid)):
                 for c in range(len(self.raw_grid[r])):
-                    new_grid[r][c].update_v(r, c, self.state_grid, e)
+                    new_grid[r][c].update_v(r, c, self.state_grid, e, i)
             self.state_grid = new_grid
 
 
 
 
-    def redo_map(self):
+    def redo_map(self, e):
         self.state_grid = []
         for r in range(len(self.raw_grid)):
             self.state_grid.append([])
             for c in range(len(self.raw_grid[r])):
-                self.state_grid[r].append(GameCell(r, c, self.raw_grid))
+                self.state_grid[r].append(GameCell(r, c, self.raw_grid, e))
 
-    def __init__(self, agent:Agent):
+    def __init__(self, agent:Agent, e):
         self.kill_map = []
         self.raw_grid = copy.deepcopy(agent.move_grid)
         if self.state_grid is None:
-            self.redo_map()
+            self.redo_map(e)
         else:
             for r in range(len(self.state_grid)):
                 for c in range(len(self.state_grid[r])):

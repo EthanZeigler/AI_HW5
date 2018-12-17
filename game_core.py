@@ -31,7 +31,7 @@ class GameMain(arcade.Window):
         self.current_stage = 0
 
         self.isDebugMode = True
-        self.isDisableEnemy = False
+        self.isDisableEnemy = True
 
         self.isRecording = False
         self.replayFile = []
