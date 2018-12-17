@@ -19,11 +19,12 @@ MAX_STAGE = len(gd.stages)  # from 0 to 9
 
 class GameMain(arcade.Window):
 
-    def __init__(self, width=SCREEN_W, height=SCREEN_H):
+    def __init__(self, agent, width=SCREEN_W, height=SCREEN_H):
         super().__init__(width, height)
 
         arcade.set_background_color(arcade.color.BLACK)
 
+        self.agent = agent
         self.proc_time = 0
         self.rendering_time = 0
 
@@ -31,7 +32,7 @@ class GameMain(arcade.Window):
         self.current_stage = 0
 
         self.isDebugMode = True
-        self.isDisableEnemy = True
+        self.isDisableEnemy = False
 
         self.isRecording = False
         self.replayFile = []
@@ -440,6 +441,8 @@ class GameMain(arcade.Window):
                     for c in range(COL_COUNT):
                         if self.move_grid[r][c] == 8:
                             self.plat_grid[r][c].isActive = False
+            elif key == arcade.key.V:
+                self.agent.print_q()
 
         if key == arcade.key.S:  # screenshot
             t = datetime.now()

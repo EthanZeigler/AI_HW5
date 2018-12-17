@@ -116,7 +116,7 @@ reward_values = { CellType.SPAWN_CELL : 0,
                   CellType.FRUIT : 1,
                   CellType.BONUS_LOW : 0.5,
                   CellType.BONUS_HIGH : 0.7,
-                  CellType.BONUS_DANGER : -0.1
+                  CellType.BONUS_DANGER : 0
 }
 
 q_transition_validity = {
@@ -137,17 +137,7 @@ q_transition_validity = {
                     Direction.DOWN: False,
                     Direction.LEFT: False,
                     Direction.RIGHT: False
-                },
-                CellType.DNE : 0,
-                CellType.PLATFORM_FULL : 0,
-                CellType.PLATFORM_ISLAND : 0,
-                CellType.PLATFORM_LEFT_DROPOFF : 0,
-                CellType.PLATFORM_RIGHT_DROPOFF : 0,
-                CellType.LADDER : 0,
-                CellType.FRUIT : 1,
-                CellType.BONUS_LOW : 0.5,
-                CellType.BONUS_HIGH : 0.7,
-                CellType.BONUS_DANGER : -0.1
+                }
 }
 
 class GameCell(object):
@@ -281,10 +271,11 @@ class GameCell(object):
 
 
     def __str__(self) -> str:
-        return (self.v.__str__() + ' ' + self.has_enemy.__str__()).center(15, " ")
+        return (self.cell_type.__str__() + ' ' + self.v.__str__()).center(15, " ")
 
 
 class GameMap:
+
     state_grid = None
     state_colors = {CellType.BONUS_DANGER: 'xkcd:pale yellow',
                     CellType.BONUS_HIGH: 'xkcd:kelly green',

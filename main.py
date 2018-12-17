@@ -17,7 +17,9 @@ class Agent(threading.Thread):
     oldScore = -1
     old_stage = -1
     my_kill_grid = []
+    old_kill_grid = None
     false_list = None
+    fruit_count = 0
 
     def __init__(self, threadID, name, counter, show_grid_info=False):
         threading.Thread.__init__(self)
@@ -41,6 +43,10 @@ class Agent(threading.Thread):
         #Define our own tracker of the last move the tanuki made
         self.tanuki_last = 0
         self.enemy_list = []
+
+
+
+        self.level_initialized = [False for _ in range(9)]
 
 
 
@@ -68,35 +74,33 @@ class Agent(threading.Thread):
         # a	bonus (500 points)
         # b	bonus (1000 points)
         # c	enemy1 (always appear on the right)
-        # if self.map is None:
-        #     self.map = ai.GameMap(self)
-        #     self.map.q_iteration(30)
-        # else:
-        #     print('lets go ', self.counter)
-        #     self.counter += 1
+
         self.my_kill_grid = copy.deepcopy(self.false_list)
-        # for enemy in self.enemy_list:
-        #     if enemy.isActive:
-        #         r, c = enemy.get_gridRC()
-        #         self.my_kill_grid[r][c] = True
+        for enemy in self.enemy_list:
+            if enemy.isActive:
+                r, c = enemy.get_gridRC()
+                self.my_kill_grid[r][c] = True
 
 
 
-        # if self.old_kill_grid:
-        #     for r in range(len(self.kill_grid)):
-        #         for c in range(len(self.kill_grid[r])):
-        #             if self.kill_grid[r][c] != self.old_kill_grid[r][c]:
-        #                 print('fail @ ', r, ' ', c)
-        #                 flag = True
-        #                 break
-        #         else:
-        #             continue
-        #         break
-        # else:
-        #     print('init old')
+
+
+        if self.old_kill_grid:
+            for r in range(len(self.kill_grid)):
+                for c in range(len(self.kill_grid[r])):
+                    if self.kill_grid[r][c] != self.old_kill_grid[r][c]:
+                        print('fail @ ', r, ' ', c)
+                        flag = True
+                        break
+                else:
+                    continue
+                break
+        else:
+            print('init old')
 
         if self.oldScore != self.total_score\
-                or self.old_stage != self.current_stage:
+                or self.old_stage != self.current_stage\
+                or flag:
             self.map = ai.GameMap(self, self.my_kill_grid)
             if self.old_stage != self.current_stage:
                 print('bad score check ', self.old_stage, ' ', self.current_stage)
@@ -107,42 +111,8 @@ class Agent(threading.Thread):
             print('redo v')
             # print(self.my_kill_grid)
 
-        # for line in game_map.state_grid:
-        #     print('[' + ' '.join('{}'.format(k[1]) for k in enumerate(line)) + ']')
-        #This performs the q iteration to get the v values after each move
-
-
-        # if self.counter % 10 == 0:
-        #     fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
-        #     ax = fig.add_subplot(111)
-        #     #bx = fig.add_subplot(123)
-        #     # I deserve to be ridiculed for this...
-        #     the_table = ax.table(
-        #                         cellText=self.map.state_grid,
-        #                          # cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
-        #                          #               for c in range(len(self.map.state_grid[r]))]
-        #                          #               for r in range(len(self.map.state_grid))],
-        #                          cellColours=[[(interp(self.map.state_grid[r][c].v,[-1, 1],[1, 0]), interp(self.map.state_grid[r][c].v,[-1, 1],[0, 1]), 0)
-        #                                     for c in range(len(self.map.state_grid[r]))]
-        #                                     for r in range(len(self.map.state_grid))],
-        #                          loc='center')
-        #
-        #     # the_other_table = bx.table(cellText=self.map.state_grid,
-        #     #                      cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
-        #     #                      for c in range(len(self.map.state_grid[r]))]
-        #     #                      for r in range(len(self.map.state_grid))],
-        #     #                      # cellColours=[[(interp(self.map.state_grid[r][c].v, [-1, 1], [1, 0]),
-        #     #                      #                interp(self.map.state_grid[r][c].v, [-1, 1], [0, 1]), 0)
-        #     #                      #               for c in range(len(self.map.state_grid[r]))]
-        #     #                      #              for r in range(len(self.map.state_grid))],
-        #     #                      loc='center')
-        #     plt.savefig("v" + self.counter.__str__() + ".png")
-        #
-        #     # sys.exit(-1)
-
 
         # let's clear some bloat!
-
         tan_cell = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c]
 
         # print('tan cell: (', self.tanuki_r, ', ', self.tanuki_c, ')')
@@ -167,128 +137,11 @@ class Agent(threading.Thread):
         if tan_cell.t_right == ai.TType.JUMP:
             v_right = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c + 2].v
 
-
-        # This will perform the chosen action for the given state and mdp analysis
-        # if vLeft == max(vLeft, vRight, vDown, vUp):
-        #     if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
-        #         self.game.on_key_press(arcade.key.LEFT, 0)
-        #     if lJump:
-        #         self.game.on_key_press(arcade.key.SPACE, 0)
-        #     else:
-        #         self.game.on_key_press(arcade.key.LEFT, 0)
-        #     self.tanuki_last = 1
-        #
-        #
-        # if vRight == max(vLeft, vRight, vDown, vUp):
-        #     if self.game.tanuki.isGoingLeft or self.game.tanuki.isGoingUpDown:
-        #         self.game.on_key_press(arcade.key.RIGHT, 0)
-        #     if rJump:
-        #         self.game.on_key_press(arcade.key.SPACE, 0)
-        #     else:
-        #         self.game.on_key_press(arcade.key.RIGHT, 0)
-        #     self.tanuki_last = 2
-        #
-        #
-        # if vUp == max(vLeft, vRight, vDown, vUp):
-        #     if not self.game.tanuki.isGoingUpDown:
-        #         self.game.on_key_press(arcade.key.UP, 0)
-        #     self.game.on_key_press(arcade.key.UP, 0)
-        #     self.tanuki_last = 3
-        #
-        #
-        # if vDown == max(vLeft, vRight, vDown, vUp):
-        #     if not self.game.tanuki.isGoingUpDown:
-        #         self.game.on_key_press(arcade.key.DOWN, 0)
-        #     self.game.on_key_press(arcade.key.DOWN, 0)
-        #     self.tanuki_last = 4
-
-
-        # #Temp v values for comparison
-        # vUp = -sys.maxsize
-        # vDown = -sys.maxsize
-        # vLeft = -sys.maxsize
-        # vRight = -sys.maxsize
-        #
-        # #Temp values saying whether each movement direction is possible
-        # rValid = False
-        # lValid = False
-        # dValid = False
-        # uValid = False
-        #
-        # #Temp values for checking whether to jump
-        # lJump = False
-        # rJump = False
-        #
-        #
-        # #Check whether each move is possible in current possition
-        # if self.tanuki_c > 0:
-        #     isValid = str(self.map.state_grid[self.tanuki_r][self.tanuki_c - 1])
-        #     if "MOVE" in isValid:
-        #         lValid = True
-        #     #Deeper check to see if spot is jumpable (needle or pitfall)
-        #     isNeedle = str(self.map.state_grid[self.tanuki_r + 1][self.tanuki_c - 1].cell_type)
-        #     if "NEEDLE" in isNeedle:
-        #         lValid = True
-        #         lJump = True
-        #     if self.tanuki_c > 1:
-        #         isDrop = str(self.map.state_grid[self.tanuki_r + 2][self.tanuki_c - 1].cell_type)
-        #         isPlat = str(self.map.state_grid[self.tanuki_r + 2][self.tanuki_c - 2].cell_type)
-        #         if "AIR" in isDrop:
-        #             if "PLATFORM" in isPlat:
-        #                 lValid = True;
-        #                 lJump = True
-        #
-        # if self.tanuki_c < 19:
-        #     isValid = str(self.map.state_grid[self.tanuki_r][self.tanuki_c + 1])
-        #     if "MOVE" in isValid:
-        #         rValid = True
-        #     # Deeper check to see if spot is jumpable (needle or pitfall)
-        #     isNeedle = str(self.map.state_grid[self.tanuki_r + 1][self.tanuki_c + 1].cell_type)
-        #     if "NEEDLE" in isNeedle:
-        #         rValid = True
-        #         rJump = True
-        #
-        #     if self.tanuki_c < 18:
-        #         isDrop = str(self.map.state_grid[self.tanuki_r + 2][self.tanuki_c + 1].cell_type)
-        #         isPlat = str(self.map.state_grid[self.tanuki_r + 2][self.tanuki_c + 2].cell_type)
-        #         if "AIR" in isDrop:
-        #             if "PLATFORM" in isPlat:
-        #                 rValid = True
-        #                 rJump = True
-        #
-        #
-        # if self.tanuki_r > 0:
-        #     isValid = str(self.map.state_grid[self.tanuki_r - 1][self.tanuki_c])
-        #     if "MOVE" in isValid:
-        #         uValid = True
-        #
-        # if self.tanuki_r < 19:
-        #     isValid = str(self.map.state_grid[self.tanuki_r + 1][self.tanuki_c])
-        #     if "MOVE" in isValid:
-        #         dValid = True
-        #
-        #
-        # #If the move is valid, then update v value for the move, otherwise v value will not be considered
-        # if rValid & (self.tanuki_last != 1):
-        #     if rJump:
-        #         vRight = self.map.state_grid[self.tanuki_r][self.tanuki_c + 2].v
-        #     else:
-        #         vRight = self.map.state_grid[self.tanuki_r][self.tanuki_c + 1].v
-        # if lValid & (self.tanuki_last != 2):
-        #     if lJump:
-        #         vLeft = self.map.state_grid[self.tanuki_r][self.tanuki_c - 2].v
-        #     else:
-        #         vLeft = self.map.state_grid[self.tanuki_r][self.tanuki_c - 1].v
-        # if uValid & (self.tanuki_last != 4):
-        #     vUp = self.map.state_grid[self.tanuki_r - 1][self.tanuki_c].v
-        # if dValid & (self.tanuki_last != 3):
-        #     vDown = self.map.state_grid[self.tanuki_r + 1][self.tanuki_c].v
-        #
-
         print('left: ', v_left, ' ', tan_cell.t_left)
         print('right: ', v_right, ' ', tan_cell.t_right)
         print('up: ', v_up, ' ', tan_cell.t_up)
         print('down: ', v_down, ' ', tan_cell.t_down)
+        print('r, c: ', self.tanuki_r, ' ', self.tanuki_c)
 
 
         #This will perform the chosen action for the given state and mdp analysis
@@ -320,8 +173,33 @@ class Agent(threading.Thread):
             self.tanuki_last = 4
 
 
+        self.old_kill_grid = self.my_kill_grid
 
+    def print_q(self):
+        fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
+        ax = fig.add_subplot(111)
+        #bx = fig.add_subplot(123)
+        # I deserve to be ridiculed for this...
+        the_table = ax.table(
+                            cellText=self.map.state_grid,
+                             # cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
+                             #               for c in range(len(self.map.state_grid[r]))]
+                             #               for r in range(len(self.map.state_grid))],
+                             cellColours=[[(interp(self.map.state_grid[r][c].v,[-1, 1],[1, 0]), interp(self.map.state_grid[r][c].v,[-1, 1],[0, 1]), 0)
+                                        for c in range(len(self.map.state_grid[r]))]
+                                        for r in range(len(self.map.state_grid))],
+                             loc='center')
 
+        # the_other_table = bx.table(cellText=self.map.state_grid,
+        #                      cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
+        #                      for c in range(len(self.map.state_grid[r]))]
+        #                      for r in range(len(self.map.state_grid))],
+        #                      # cellColours=[[(interp(self.map.state_grid[r][c].v, [-1, 1], [1, 0]),
+        #                      #                interp(self.map.state_grid[r][c].v, [-1, 1], [0, 1]), 0)
+        #                      #               for c in range(len(self.map.state_grid[r]))]
+        #                      #              for r in range(len(self.map.state_grid))],
+        #                      loc='center')
+        plt.savefig("v" + self.counter.__str__() + ".png")
 
     def run(self):
         print("Starting " + self.name)
@@ -351,8 +229,11 @@ class Agent(threading.Thread):
 
             #Row coordinate regulizer, code doesn't work without it
             self.tanuki_r = self.tanuki_r - 1
-
+            if not self.level_initialized[self.current_stage - 1]:
+                self.level_initialized[self.current_stage - 1] = True
+                time.sleep(2)
             self.ai_function()
+            self.tanuki_r += 1
 
             # Display grid information (can be turned off if performance issue exists)
             # if self.show_grid_info:
@@ -382,7 +263,7 @@ class Agent(threading.Thread):
 
 def main():
     ag = Agent(1, "to lose my mind", 1, True)
-    ag.game = game_core.GameMain()
+    ag.game = game_core.GameMain(ag)
     ag.start()
 
     ag.game.set_location(800, 400)
