@@ -78,7 +78,7 @@ class Agent(threading.Thread):
         for enemy in self.enemy_list:
             if enemy.isActive:
                 r, c = enemy.get_gridRC()
-                self.my_kill_grid[r][c] = True
+                self.my_kill_grid[r+1][c] = True
 
 
 
@@ -101,7 +101,7 @@ class Agent(threading.Thread):
             if self.old_stage != self.current_stage:
                 self.old_stage = self.current_stage
                 self.map.redo_map()
-            self.map.q_iteration(30, self.my_kill_grid)
+            self.map.q_iteration(40, self.my_kill_grid)
             # print(self.my_kill_grid)
 
         # for line in game_map.state_grid:
@@ -112,7 +112,7 @@ class Agent(threading.Thread):
 
         # fig = plt.figure(num=None, figsize=(30, 10), dpi=200, facecolor='w', edgecolor='k')
         # ax = fig.add_subplot(111)
-        # # bx = fig.add_subplot(123)
+        # #bx = fig.add_subplot(123)
         # # I deserve to be ridiculed for this...
         # the_table = ax.table(cellText=self.map.state_grid,
         #                      # cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
@@ -122,18 +122,18 @@ class Agent(threading.Thread):
         #                                 for c in range(len(self.map.state_grid[r]))]
         #                                 for r in range(len(self.map.state_grid))],
         #                      loc='center')
-        #
-        # # the_other_table = bx.table(cellText=self.map.state_grid,
-        # #                      cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
-        # #                      for c in range(len(self.map.state_grid[r]))]
-        # #                      for r in range(len(self.map.state_grid))],
-        # #                      # cellColours=[[(interp(self.map.state_grid[r][c].v, [-1, 1], [1, 0]),
-        # #                      #                interp(self.map.state_grid[r][c].v, [-1, 1], [0, 1]), 0)
-        # #                      #               for c in range(len(self.map.state_grid[r]))]
-        # #                      #              for r in range(len(self.map.state_grid))],
-        # #                      loc='center')
-        # plt.savefig("v.png")
-        #
+
+        # the_other_table = bx.table(cellText=self.map.state_grid,
+        #                      cellColours=[[self.map.state_colors[(self.map.state_grid[r][c]).cell_type]
+        #                      for c in range(len(self.map.state_grid[r]))]
+        #                      for r in range(len(self.map.state_grid))],
+        #                      # cellColours=[[(interp(self.map.state_grid[r][c].v, [-1, 1], [1, 0]),
+        #                      #                interp(self.map.state_grid[r][c].v, [-1, 1], [0, 1]), 0)
+        #                      #               for c in range(len(self.map.state_grid[r]))]
+        #                      #              for r in range(len(self.map.state_grid))],
+        #                      loc='center')
+        #plt.savefig("v.png")
+
         # sys.exit(-1)
 
 
