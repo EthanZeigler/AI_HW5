@@ -116,7 +116,7 @@ reward_values = { CellType.SPAWN_CELL : 0,
                   CellType.FRUIT : 1,
                   CellType.BONUS_LOW : 0.5,
                   CellType.BONUS_HIGH : 0.7,
-                  CellType.BONUS_DANGER : 0
+                  CellType.BONUS_DANGER : -0.1
 }
 
 q_transition_validity = {
@@ -290,11 +290,13 @@ class GameMap:
                     CellType.AIR: "w",
                     CellType.NEEDLE: "xkcd:orangish",
                     CellType.SPAWN_CELL: "xkcd:dark sand"}
+    fruit_counter = 0
 
 
     def q_iteration(self, n:int, e:[]):
         """Runs q_iteration on the state grid. raw_grid will not be affected"""
         self.kill_map = e
+
         for i in range(n):
             new_grid = copy.deepcopy(self.state_grid)
             for r in range(len(self.raw_grid)):
@@ -307,10 +309,19 @@ class GameMap:
 
     def redo_map(self, e):
         self.state_grid = []
+        self.fruit_counter = 0
+        reward_values[CellType.BONUS_DANGER] = -0.1
         for r in range(len(self.raw_grid)):
             self.state_grid.append([])
             for c in range(len(self.raw_grid[r])):
                 self.state_grid[r].append(GameCell(r, c, self.raw_grid, e))
+                curr_cell = GameCell(r, c, self.raw_grid, e)
+                if "FRUIT" in str(curr_cell.cell_type):
+                    self.fruit_counter += 1
+        print(self.fruit_counter)
+        if self.fruit_counter == 1:
+            reward_values[CellType.BONUS_DANGER] = 0
+
 
     def __init__(self, agent:Agent, e):
         self.kill_map = []

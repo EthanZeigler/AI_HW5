@@ -59,6 +59,7 @@ class Agent(threading.Thread):
         print(self.counter)
         self.counter += 1
 
+
         if self.false_list is None:
             self.false_list = [[False for _ in range(len(self.kill_grid[0]))] for _ in range(len(self.kill_grid))]
         # To send a key stroke to the game, use self.game.on_key_press() method
@@ -106,7 +107,7 @@ class Agent(threading.Thread):
                 print('bad score check ', self.old_stage, ' ', self.current_stage)
                 self.old_stage = self.current_stage
                 self.map.redo_map(self.my_kill_grid)
-            self.map.q_iteration(40, self.my_kill_grid)
+            self.map.q_iteration(30, self.my_kill_grid)
             self.oldScore = self.total_score
             print('redo v')
             # print(self.my_kill_grid)
@@ -145,32 +146,36 @@ class Agent(threading.Thread):
 
 
         #This will perform the chosen action for the given state and mdp analysis
-        if v_left == max(v_left, v_right, v_down, v_up):
-            if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
-                self.game.on_key_press(arcade.key.LEFT, 0)
-            if tan_cell.t_left == ai.TType.JUMP:
-                self.game.on_key_press(arcade.key.SPACE, 0)
-            else:
-                self.game.on_key_press(arcade.key.LEFT, 0)
-            self.tanuki_last = 1
-        elif v_right == max(v_left, v_right, v_down, v_up):
-            if self.game.tanuki.isGoingLeft or self.game.tanuki.isGoingUpDown:
-                self.game.on_key_press(arcade.key.RIGHT, 0)
-            if tan_cell.t_right == ai.TType.JUMP:
-                self.game.on_key_press(arcade.key.SPACE, 0)
-            else:
-                self.game.on_key_press(arcade.key.RIGHT, 0)
-            self.tanuki_last = 2
-        elif v_up == max(v_left, v_right, v_down, v_up):
-            if not self.game.tanuki.isGoingUpDown:
+        if max(v_left, v_right, v_down, v_up) >= 0:
+            if v_left == max(v_left, v_right, v_down, v_up):
+                if (not self.game.tanuki.isGoingLeft) or self.game.tanuki.isGoingUpDown:
+                    self.game.on_key_press(arcade.key.LEFT, 0)
+                if tan_cell.t_left == ai.TType.JUMP:
+                    self.game.on_key_press(arcade.key.SPACE, 0)
+                else:
+                    self.game.on_key_press(arcade.key.LEFT, 0)
+                self.tanuki_last = 1
+            elif v_right == max(v_left, v_right, v_down, v_up):
+                if self.game.tanuki.isGoingLeft or self.game.tanuki.isGoingUpDown:
+                    self.game.on_key_press(arcade.key.RIGHT, 0)
+                if tan_cell.t_right == ai.TType.JUMP:
+                    self.game.on_key_press(arcade.key.SPACE, 0)
+                else:
+                    self.game.on_key_press(arcade.key.RIGHT, 0)
+                self.tanuki_last = 2
+            elif v_up == max(v_left, v_right, v_down, v_up):
+                if not self.game.tanuki.isGoingUpDown:
+                    self.game.on_key_press(arcade.key.UP, 0)
                 self.game.on_key_press(arcade.key.UP, 0)
-            self.game.on_key_press(arcade.key.UP, 0)
-            self.tanuki_last = 3
-        elif v_down == max(v_left, v_right, v_down, v_up):
-            if not self.game.tanuki.isGoingUpDown:
+                self.tanuki_last = 3
+            elif v_down == max(v_left, v_right, v_down, v_up):
+                if not self.game.tanuki.isGoingUpDown:
+                    self.game.on_key_press(arcade.key.DOWN, 0)
                 self.game.on_key_press(arcade.key.DOWN, 0)
-            self.game.on_key_press(arcade.key.DOWN, 0)
-            self.tanuki_last = 4
+                self.tanuki_last = 4
+        else:
+            print("no move")
+
 
 
         self.old_kill_grid = self.my_kill_grid
@@ -229,9 +234,9 @@ class Agent(threading.Thread):
 
             #Row coordinate regulizer, code doesn't work without it
             self.tanuki_r = self.tanuki_r - 1
-            if not self.level_initialized[self.current_stage - 1]:
-                self.level_initialized[self.current_stage - 1] = True
-                time.sleep(2)
+            # if not self.level_initialized[self.current_stage - 1]:
+            #     self.level_initialized[self.current_stage - 1] = True
+            #     time.sleep(1)
             self.ai_function()
             self.tanuki_r += 1
 
